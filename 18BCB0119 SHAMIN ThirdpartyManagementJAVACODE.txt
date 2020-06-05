@@ -1,0 +1,569 @@
+//made by SHAMIN CHOKSHI 18BCB0119 VIT UNIVERSITY VELLORE
+//THIRD PARTY MANAGEMENT SYSTEM FOR LOAN COLLECTION OF CREDIT CARD LOANS 
+//UNDER OUR PROFESSOR CUM PROJECT MANAGER PROF. SATISH C.J
+//USES MYSQL DATABASES AND JAVA (JDBC-JAVA DATABASE CONNECTION API)
+//COPY THIS CODE AND PASTE IT IN A JAVA ENVIRONMENT LIKE ECLIPSE
+import java.sql.*;
+import java.util.*;
+import java.lang.*; //importing all necessary java package
+class test 
+{ static Scanner sc = new Scanner(System.in);//creating static object
+  static int id;
+  static String post="";
+  static String dbURL = "jdbc:mysql://localhost:3306/sampledb";
+  static String username = "root";
+  static String password = "imindian";
+  static int str1=0;
+  static String str2="";
+  static String loginstatus="";
+  static String message1="";
+    public static void main(String[] args) //main function
+    { Scanner sc = new Scanner(System.in);
+    	
+    	int choiceofpost,choiceofoperation,userLoginChoice;
+    	do{message1="";
+    	System.out.println("press 1 if you are a new user" );
+    	System.out.println("press 2 if you already have an account and want to login" );
+    	userLoginChoice=sc.nextInt();
+    	
+    	//loop for getting correct user choice
+    	do{switch(userLoginChoice){
+    	case 1 : signup();// function to sign up as a new user
+    	break;
+    	case 2:System.out.println("proceeding to login....");
+    	break;
+    	default:System.out.println("invalid choice.");
+    	}
+    		
+    	}while(userLoginChoice!=1 && userLoginChoice!=2);
+    	
+    	//login process
+    	
+    	try {
+       	 
+    	    Connection conn = DriverManager.getConnection(dbURL, username, password);
+    	    Statement stmt = conn.createStatement();
+    	    if (conn != null) 
+    	    {   
+    	        System.out.println("Connected to database for login");
+    	        System.out.print("Enter your id : ");  
+    	         str1 = sc.nextInt();//entering id of the user
+    	        System.out.print("Enter the user password : ");  
+    	        str2 = sc.next();//entering password of user
+    	        do{
+    	        	System.out.println("press 1 if you are a bank manager");
+    	        	System.out.println("press 2 if you are a third party manager");
+    	        	System.out.println("press 3 if you are a third party agent");
+    	        	choiceofpost=sc.nextInt();//entering choice of post for login
+    	        	switch(choiceofpost){
+    	        	
+    	            case 1: 
+    	                post="bm"; 
+    	                break; 
+    	            case 2: 
+    	                post="tpm"; 
+    	                break; 
+    	            case 3: 
+    	                post="tpa"; 
+    	                break;
+    	            default: 
+    	            	String message="invalid choice"; 
+    	            	System.out.println(message);
+    	            	System.out.println("enter post again ");
+    	            	break;
+    	                 
+    	        	}
+    	        	}while(choiceofpost!=1 && choiceofpost!=2 && choiceofpost!=3  );
+    	       
+    	        //CHECKING IF CREDENTIALS EXIST IN LOGIN TABLE
+    	        ResultSet rs = stmt.executeQuery("select * from login where id='" + str1 + "' and password='" + str2 + "' and post='" + post +"'"); 
+    	      
+    	        if (rs.next())  
+    	         {id= str1;  //id for the whole program is the id you entered while u login(if you login successfully)
+    	         loginstatus="loggedin";
+    	         }
+    	          
+    	        else  
+    	         {message1="Invalid user name and password";  
+    	          System.out.println(message1);  
+    	         }
+    	        
+    	        }
+    	}
+    	catch (SQLException ex) 
+    	{
+   	     ex.printStackTrace();
+   	 }
+    	
+    	
+    	
+    
+    	
+    	
+    	if( loginstatus=="loggedin" && post=="bm")
+    	{
+    		 do{//if your post is of a bank manager then these are your set of functions
+                 
+                 System.out.println("--------BANK MANAGER OPERATIONS-----------");
+                 System.out.println("press 1 for entry in defaulter table");
+                 System.out.println("press 2 to view defaulter table");
+                 System.out.println("press 3 to get information of amount collected and commission details for third party managers");
+                 System.out.println("press 4 to delete customers from defaulters who have paid loans fully");
+                 System.out.println("press 5 to exit");
+                 choiceofoperation=sc.nextInt();
+                 
+                 switch(choiceofoperation)//selection for choice of operation
+                 {
+                         case 1:         //entry in defaulter table
+                        	             bmentryindefaultertable();
+                                         break;
+                         case 2:
+                                         //view defaulter table
+                        	             bmviewtable();
+                                         break;
+                         case 3:
+                                      //get information of amount collected and commission details for third party managers
+            	                      bmpaymentretrievedview();
+                                      break; 
+                         case 4:
+                             //delete customers from defaulters who have paid loans fully
+                        	        deletecustomerswhoseloanispaid();
+                                     break;            
+                         
+                         case 5:
+                                         System.exit(0);
+                                         break;
+                         default:
+                        	           System.out.println("Invalid choice:");
+                                         break;
+                 }
+         }while(choiceofoperation!=5);
+    		
+    	}
+    	else if (loginstatus=="loggedin" && post=="tpm")
+    	{
+    		do{//if your post is of a third party manager then these are your set of functions
+                
+                System.out.println("--------THIRD PARTY MANAGER OPERATIONS-----------");
+                System.out.println("press 1 for viewing defaulters assigned to you by bank manager");
+                System.out.println("press 2 for assignig third party agents");
+                System.out.println("press 3 to exit");
+                choiceofoperation=sc.nextInt();
+                
+                switch(choiceofoperation)//seelection for choice of operation
+                {
+                        case 1: 
+                                        //viewing defaulters assigned to you by bank manager
+                        	            tpmviewtable();
+                                        break;
+                        case 2:
+                                        //assign third party agents
+                        	             tpmassigntpa();
+                                        break;
+                        
+                        case 3:
+                                        System.exit(0);
+                                        break;
+                        default:
+                       	           System.out.println("Invalid choice:");
+                                        break;
+                }
+        }while(choiceofoperation!=3);
+    		
+    	}
+    	else if (loginstatus=="loggedin" && post=="tpa")
+    	{
+           do{//if your post is of a third party agent then these are your set of functions
+                
+                System.out.println("--------THIRD PARTY AGENT OPERATIONS-----------");
+                System.out.println("press 1 for viewing defaulters assigned to you by your third party manager manager");
+                System.out.println("press 2 for updating information of recovered payments");
+                System.out.println("press 3 to exit");
+                choiceofoperation=sc.nextInt();
+                
+                switch(choiceofoperation)//seelection for choice of operation
+                {
+                        case 1: 
+                                        //viewing defaulters assigned to you by your third party manager manager
+                        	            tpaviewtable();
+                                        break;
+                        case 2:
+                                        //updating information of recovered payments
+                        	            tpapaymentupdate();
+                                        break;
+                       
+                        case 3:
+                                        System.exit(0);
+                                        break;
+                        default:
+                       	           System.out.println("Invalid choice:");
+                                        break;
+                }
+        }while(choiceofoperation!=3);
+    		
+    	
+    	} }while( message1=="Invalid user name and password");     	
+    	    
+    
+    }
+    public static void bmentryindefaultertable()//function of bank manager for entry in defaulter table
+    {
+    	 
+    	  
+    	 try {
+    	  
+    	     Connection conn = DriverManager.getConnection(dbURL, username, password);//establishes connection with database
+    	  
+    	     if (conn != null) {
+    	         System.out.println("Connected to database"); 
+    	         String entry = "INSERT INTO defaulters (custid,custname,typeofloan,amounttoberec,tpmassigned) VALUES (?, ?, ?, ?, ?)";
+    	          //executing the query
+    	         PreparedStatement statement = conn.prepareStatement(entry);
+    	         System.out.println("enter the customer id (5 digit id)");//entering details of defaulters
+    	         int custid;
+    	         custid=sc.nextInt();
+    	         System.out.println("enter the customer name");
+    	         String custname;
+    	         custname=sc.nextLine();
+    	         System.out.println("enter the type of loan(example:credit card , home loan, auto loan etc...)");
+    	         String typeofloan;
+    	         typeofloan=sc.nextLine();
+    	         System.out.println("enter the amount of money to be recovered");
+    	         int amounttoberec;
+    	         do{
+    	        	 amounttoberec=sc.nextInt();
+    	        	 if(amounttoberec==0){System.out.println("enter a non zero amount");}
+    	         }while(amounttoberec==0);//amount to be recovered cannot be zero because if it is zero then the customer is not a defaulter
+    	         
+    	         System.out.println("enter the id of the third party manager asigned to recover this money");
+    	         int tpmassigned ;
+    	         tpmassigned=sc.nextInt();
+    	         //storing the entered details of defaulters in the database
+    	         statement.setInt(1, custid);
+    	         statement.setString(2, custname);
+    	         statement.setString(3, typeofloan);
+    	         statement.setInt(4, amounttoberec);
+    	         statement.setInt(5, tpmassigned);
+    	          
+    	         int rowsInserted = statement.executeUpdate();
+    	         if (rowsInserted > 0) {
+    	             System.out.println("A new user was inserted successfully!");
+    	         }
+    	     }
+    	 } catch (SQLException ex) {
+    	     ex.printStackTrace();
+    	 }
+    	
+    }
+    public static void bmviewtable()//function of bank manager to view defaulter table
+    {
+    	
+    	 
+    	try {
+    	 
+    	    Connection conn = DriverManager.getConnection(dbURL, username, password);
+    	 
+    	    if (conn != null) {
+    	        System.out.println("Connected to database");
+    	        String entry = "SELECT * FROM defaulters";
+    	        //executing the query
+    	        Statement statement = conn.createStatement();
+    	        ResultSet result = statement.executeQuery(entry);
+    	         
+    	        
+    	         
+    	        while (result.next()){//retrieving details of defaulters from the database
+    	            String custid = result.getString(1);
+    	            String custname = result.getString(2);
+    	            String typeofloan = result.getString(3);
+    	            int amounttoberec = result.getInt("amounttoberec");
+    	            int tpmassigned = result.getInt("tpmassigned");
+    	            int amountrecovered=result.getInt("amountrecovered");
+    	            //printing the retrieved details in a tabular form
+    	            System.out.print("customer id:  "+custid+"  ");
+    	            System.out.print("customer name:"+custname+"  ");
+    	            System.out.print("type of loan:"+typeofloan+"  ");
+    	            System.out.print("amount to be recovered:"+amounttoberec+"  ");
+    	            System.out.print("amount recovered:"+amountrecovered+"  ");
+    	            System.out.println("third party manager assigned:"+tpmassigned+"  ");
+    	        }
+    	    }
+    	} catch (SQLException ex) {
+    	    ex.printStackTrace();
+    	}
+    	
+    }
+    
+   
+    
+    public static void tpmviewtable()
+    {
+    	 
+    	try {
+    	 
+    	    Connection conn = DriverManager.getConnection(dbURL, username, password);
+    	 
+    	    if (conn != null) {
+    	        System.out.println("Connected to database");
+    	        String entry = "SELECT * FROM defaulters WHERE tpmassigned="+id;
+    	      //executing the query
+    	      //third party manager can only see entries which are assigned to him
+    	        Statement statement = conn.createStatement();
+    	        ResultSet result = statement.executeQuery(entry);
+    	         
+    	        int count = 0;
+    	       
+    	        while (result.next()){//retrieving details of defaulters from the database
+    	            String custid = result.getString(1);
+    	            String custname = result.getString(2);
+    	            String typeofloan = result.getString(3);
+    	            int amounttoberec = result.getInt("amounttoberec");
+    	            int tpmassigned = result.getInt("tpmassigned");
+    	            int tpagent= result.getInt("tpagent");
+    	            //printing the retrieved details in a tabular form
+    	            System.out.print("customer id:  "+custid+"  ");
+    	            System.out.print("customer name:"+custname+"  ");
+    	            System.out.print("type of loan:"+typeofloan+"  ");
+    	            System.out.print("amount to be recovered:"+amounttoberec+"  ");
+    	            System.out.print("third party manager assigned:"+tpmassigned+"  ");
+    	            System.out.println("third party agent assigned:"+tpagent+"  ");
+    	        }
+    	    }
+    	} catch (SQLException ex) {
+    	    ex.printStackTrace();
+    	}	
+    }
+    
+    public static void tpmassigntpa()
+    {
+    	
+     
+          try {
+     
+               Connection conn = DriverManager.getConnection(dbURL, username, password);
+     
+               if (conn != null) 
+               {
+               System.out.println("Connected to database ");
+               System.out.println("enter the customer id of the customer to whom you want to assign a third party agent");
+               int tempcustid=sc.nextInt();//entering the customer id of the customer to whom you want to assign a third party agent
+               String entry = "UPDATE defaulters SET tpagent=? WHERE custid="  +tempcustid;//updating the entry where the customer id is entered as above
+               System.out.println("enter the id of the third party agent you want to assign");
+               int tpagent=sc.nextInt();
+               PreparedStatement statement = conn.prepareStatement(entry);
+               statement.setInt(1, tpagent);
+               
+                
+               int rowsUpdated = statement.executeUpdate();
+               if (rowsUpdated > 0) {
+                   System.out.println("An third party agent was updated successfully!");
+               }
+               }
+             }     
+          catch (SQLException ex) 
+          {
+                  ex.printStackTrace();
+           }
+    	
+    }
+    
+    public static void tpaviewtable()
+    {
+    	 
+    	try {
+    	 
+    	    Connection conn = DriverManager.getConnection(dbURL, username, password);
+    	 
+    	    if (conn != null) {
+    	        System.out.println("Connected to database");
+    	        String entry = "SELECT * FROM defaulters WHERE tpagent="+id;
+    	      //executing the query
+    	        //third party agent can only see entries which are assigned to him
+    	        Statement statement = conn.createStatement();
+    	        ResultSet result = statement.executeQuery(entry);
+    	         
+    	        int count = 0;
+    	       
+    	        while (result.next()){//retrieving details of defaulters from the database
+    	            String custid = result.getString(1);
+    	            String custname = result.getString(2);
+    	            String typeofloan = result.getString(3);
+    	            int amounttoberec = result.getInt("amounttoberec");
+    	            int amountrecovered = result.getInt("amountrecovered");
+    	            int tpmassigned = result.getInt("tpmassigned");
+    	            int tpagent= result.getInt("tpagent");
+    	            //printing the retrieved details in a tabular form
+    	            System.out.print("customer id:  "+custid+"  ");
+    	            System.out.print("customer name:"+custname+"  ");
+    	            System.out.print("type of loan:"+typeofloan+"  ");
+    	            System.out.print("amount to be recovered:"+amounttoberec+"  ");
+    	            System.out.print("amount recovered:"+amountrecovered+"  ");
+    	            System.out.print("third party manager assigned:"+tpmassigned+"  ");
+    	            System.out.println("third party agent assigned:"+tpagent+"  ");
+    	        }
+    	    }
+    	} catch (SQLException ex) {
+    	    ex.printStackTrace();
+    	}	
+    }
+    
+    public static void tpapaymentupdate()
+    {
+    	 
+    	try {
+    	 
+    	    Connection conn = DriverManager.getConnection(dbURL, username, password);
+    	 
+    	    if (conn != null) {
+    	        System.out.println("Connected to database");
+    	        System.out.println("enter the customer id of the customer whose loan payment info you want to update");
+                int tempcustid=sc.nextInt();
+                System.out.println("enter the amount of payment recieved from the customer");
+                int paymentrecieved =sc.nextInt();
+                String sqlent = "SELECT * FROM defaulters WHERE custid="+tempcustid;
+                
+                Statement statement1 = conn.createStatement();
+                ResultSet result = statement1.executeQuery(sqlent);
+                 
+                int count = 0;
+                 
+                 result.next();
+                 
+                    int amounttoberec = result.getInt("amounttoberec");
+                    int amountrecovered = result.getInt("amountrecovered");
+                    int newamounttoberec=amounttoberec-paymentrecieved;//as the customer has paid some amount amount left to be recovered is reduced by the amount paid
+                    int newamountrecovered =amountrecovered+paymentrecieved;//and total amount recovered increases by the amount paid  
+                
+    	        String entry = "UPDATE defaulters SET amounttoberec=?, amountrecovered=? WHERE custid="+tempcustid;
+    	        
+    	        PreparedStatement statement = conn.prepareStatement(entry);
+    	        statement.setInt(1, newamounttoberec);//inserted the new amoount to be recovered
+    	        statement.setInt(2,newamountrecovered );// inserted the new amount recovered
+    	       
+                
+    	        int rowsUpdated = statement.executeUpdate();
+                
+    	        if (rowsUpdated > 0) {
+    	            System.out.println("An existing user was updated successfully!");
+    	        }
+                }
+                
+              
+              
+    	} catch (SQLException ex) {
+    	    ex.printStackTrace();
+    	}
+    	
+    }
+    
+    public static void signup()
+    {
+    	  
+    	 try {
+    	  
+    	     Connection conn = DriverManager.getConnection(dbURL, username, password);//establishes connection with database
+    	  
+    	     if (conn != null) {
+    	         System.out.println("Connected to database"); 
+    	         String entry = "INSERT INTO login (id,password,post) VALUES (?, ?, ?)";
+    	         
+    	         PreparedStatement statement = conn.prepareStatement(entry);
+    	         System.out.println("enter the id (5 digit id)");//entering details for signing up as a new user
+    	         int id;
+    	         id=sc.nextInt();
+    	         System.out.println("enter the password");
+    	         String signuppassword;
+    	         signuppassword=sc.next();
+    	         int choiceofpostdatabase;
+    	         do{
+     	        	System.out.println("press 1 if your post is of a bank manager");
+     	        	System.out.println("press 2 if yor post is of a third party manager");
+     	        	System.out.println("press 3 if your post is of a party agent");
+     	        	 choiceofpostdatabase=sc.nextInt();//entering choice to decide your role in this program
+     	        	switch(choiceofpostdatabase){
+     	        	
+     	            case 1: 
+     	                post="bm"; 
+     	                break; 
+     	            case 2: 
+     	                post="tpm"; 
+     	                break; 
+     	            case 3: 
+     	                post="tpa"; 
+     	                break;
+     	            default: 
+     	            	System.out.println("invalid choice"); 
+     	                break; 
+     	        	}
+     	        	}while(choiceofpostdatabase!=1 && choiceofpostdatabase!=2 && choiceofpostdatabase!=3  );
+    	         
+    	         //storing the entered details of defaulters in the database
+    	         statement.setInt(1, id);
+    	         statement.setString(2, signuppassword);
+    	         statement.setString(3, post);
+    	         
+    	          
+    	         int rowsInserted = statement.executeUpdate();
+    	         if (rowsInserted > 0) {
+    	             System.out.println("A new user was inserted successfully!");
+    	         }
+    	     }
+    	 } catch (SQLException ex) {
+    	     ex.printStackTrace();
+    	 }
+    	
+    }
+
+    public static void bmpaymentretrievedview()
+    {
+    	 
+    	  
+    	 try {
+    	  
+    	     Connection conn = DriverManager.getConnection(dbURL, username, password);//establishes connection with database
+    	  
+    	     if (conn != null) {
+    	         System.out.println("Connected to database"); 
+    	         String entry = " SELECT SUM(amountrecovered) from defaulters";
+    	         Statement pst= conn.prepareStatement(entry);
+                 ResultSet rs = pst.executeQuery(entry);
+                  
+                 int count = 0;
+                  
+                 if(rs.next()){
+                     int sum = rs.getInt("Sum(amountrecovered)");
+                     System.out.println(sum);
+                     int commision = (sum/100)*40;
+                     System.out.println("commision to be given to third party managers out of the total recovery of rs "+ sum +"is 40% which is rs." +commision);
+                 }
+                 String entry1 = "UPDATE defaulters set amountrecovered=?";
+     	        
+     	        PreparedStatement statement = conn.prepareStatement(entry1);
+     	       statement.setInt(1, 0);
+     	      int rowsUpdated = statement.executeUpdate();
+    	     }
+    	 }
+    	 catch (SQLException ex) 
+    	    {
+    	     ex.printStackTrace();
+                     
+            }  
+    }
+     public static void deletecustomerswhoseloanispaid()
+     {
+        
+        String sql = "delete from defaulters where amounttoberec=0";//deleting the entry where amount to be recovered is 0 as he has paid his loan and is no more a defaulter
+
+        try {
+        		Connection conn = DriverManager.getConnection(dbURL, username, password); 
+            Statement stmt = conn.createStatement(); 
+          
+          stmt.executeUpdate(sql);
+          System.out.println("Record deleted successfully");
+        }
+        catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+} 
+

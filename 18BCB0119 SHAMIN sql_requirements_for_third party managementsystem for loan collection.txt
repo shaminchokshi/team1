@@ -1,0 +1,27 @@
+mysql> desc defaulters;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| custid          | int(6)      | NO   | PRI | NULL    |       |
+| custname        | varchar(45) | NO   |     | NULL    |       |
+| typeofloan      | varchar(20) | NO   |     | NULL    |       |
+| amounttoberec   | int(20)     | NO   |     | NULL    |       |
+| amountrecovered | int(20)     | YES  |     | NULL    |       |
+| remarks         | varchar(60) | YES  |     | NULL    |       |
+| tpmassigned     | int(5)      | NO   |     | NULL    |       |
+| tpagent         | int(5)      | YES  |     | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+
+set the following schema of the defaulter table using create table statement;
+
+mysql> desc login
+    -> ;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| id       | int(5)      | NO   |     | NULL    |       |
+| password | varchar(20) | NO   |     | NULL    |       |
+| post     | varchar(3)  | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+set the following schema of the login table using create table statement;
